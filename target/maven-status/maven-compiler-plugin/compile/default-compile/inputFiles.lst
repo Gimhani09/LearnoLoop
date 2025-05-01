@@ -1,33 +1,7 @@
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Like.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\QuizAttemptController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Comment.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\SkillService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\QuizAttemptService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\NotificationRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\UserController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\CommentController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\NotificationService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\User.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\CommentService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\QuizService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\QuizAttemptRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\ReportController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Skill.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\UserService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\LernoloopApplication.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\LikeRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\SkillRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\LikeController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\ReportRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\QuizRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Report.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\NotificationController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\SkillController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Quiz.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\controller\QuizController.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\Notification.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\UserRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\repository\CommentRepository.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\model\QuizAttempt.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\ReportService.java
-C:\Users\DELL\Desktop\demo\src\main\java\com\example\demo\service\LikeService.java
+D:\PAF App\src\main\java\com\example\pafapp\controller\SkillSharingIdeaController.java
+D:\PAF App\src\main\java\com\example\pafapp\service\CloudinaryService.java
+D:\PAF App\src\main\java\com\example\pafapp\config\CloudinaryConfig.java
+D:\PAF App\src\main\java\com\example\pafapp\controller\WebController.java
+D:\PAF App\src\main\java\com\example\pafapp\model\SkillSharingIdea.java
+D:\PAF App\src\main\java\com\example\pafapp\PafAppApplication.java
+D:\PAF App\src\main\java\com\example\pafapp\repository\SkillSharingIdeaRepository.java

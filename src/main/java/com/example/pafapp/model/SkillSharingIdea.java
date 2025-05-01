@@ -2,6 +2,7 @@ package com.example.pafapp.model;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,17 +16,33 @@ public class SkillSharingIdea {
     
     private String description;
     
+    private String mediaUrl;
+    
+    private String mediaType; // "image" or "video"
+    
+    private String publicId; // Cloudinary public ID for deletion
+    
+    @CreatedDate
     private Date createdAt;
     
     // Default constructor
     public SkillSharingIdea() {
         this.createdAt = new Date();
     }
-    
-    // Constructor with fields
+      // Constructor with fields
     public SkillSharingIdea(String title, String description) {
         this.title = title;
         this.description = description;
+        this.createdAt = new Date();
+    }
+    
+    // Constructor with fields including media
+    public SkillSharingIdea(String title, String description, String mediaUrl, String mediaType, String publicId) {
+        this.title = title;
+        this.description = description;
+        this.mediaUrl = mediaUrl;
+        this.mediaType = mediaType;
+        this.publicId = publicId;
         this.createdAt = new Date();
     }
     
@@ -57,14 +74,38 @@ public class SkillSharingIdea {
     public Date getCreatedAt() {
         return createdAt;
     }
-    
-    public void setCreatedAt(Date createdAt) {
+      public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+    
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+    
+    public String getMediaType() {
+        return mediaType;
+    }
+    
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+    
+    public String getPublicId() {
+        return publicId;
+    }
+    
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
     }
     
     @Override
     public String toString() {
         return "SkillSharingIdea [id=" + id + ", title=" + title + 
-               ", description=" + description + ", createdAt=" + createdAt + "]";
+               ", description=" + description + ", mediaUrl=" + mediaUrl + 
+               ", mediaType=" + mediaType + ", createdAt=" + createdAt + "]";
     }
 }

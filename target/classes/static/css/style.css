@@ -1,0 +1,119 @@
+/* Custom styles for Skill Sharing Ideas */
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: transform 0.3s;
+}
+
+.idea-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.idea-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions-container {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.edit-btn:hover {
+    color: #0d6efd;
+}
+
+.delete-btn:hover {
+    color: #dc3545;
+}
+
+.date-display {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+#loading {
+    padding: 40px 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Form styles */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+/* Toast notification */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Add media-related styles */
+
+.media-container {
+    margin-top: 15px;
+    text-align: center;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.media-container img, 
+.media-container video {
+    max-width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.media-container img:hover {
+    transform: scale(1.02);
+}
+
+#mediaPreviewContainer,
+#editMediaPreviewContainer {
+    margin-top: 10px;
+}
+
+#mediaPreview,
+#editMediaPreview {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
