@@ -22,6 +22,8 @@ public class SkillSharingIdea {
     
     private String publicId; // Cloudinary public ID for deletion
     
+    private int likesCount = 0; // Added likes counter with default value of 0
+    
     @CreatedDate
     private Date createdAt;
     
@@ -35,14 +37,14 @@ public class SkillSharingIdea {
         this.description = description;
         this.createdAt = new Date();
     }
-    
-    // Constructor with fields including media
+      // Constructor with fields including media
     public SkillSharingIdea(String title, String description, String mediaUrl, String mediaType, String publicId) {
         this.title = title;
         this.description = description;
         this.mediaUrl = mediaUrl;
         this.mediaType = mediaType;
         this.publicId = publicId;
+        this.likesCount = 0;
         this.createdAt = new Date();
     }
     
@@ -102,10 +104,18 @@ public class SkillSharingIdea {
         this.publicId = publicId;
     }
     
-    @Override
+    public int getLikesCount() {
+        return likesCount;
+    }
+    
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
+    }
+      @Override
     public String toString() {
         return "SkillSharingIdea [id=" + id + ", title=" + title + 
                ", description=" + description + ", mediaUrl=" + mediaUrl + 
-               ", mediaType=" + mediaType + ", createdAt=" + createdAt + "]";
+               ", mediaType=" + mediaType + ", likesCount=" + likesCount + 
+               ", createdAt=" + createdAt + "]";
     }
 }

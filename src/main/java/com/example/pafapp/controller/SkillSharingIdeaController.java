@@ -24,15 +24,20 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.pafapp.model.SkillSharingIdea;
 import com.example.pafapp.repository.SkillSharingIdeaRepository;
 import com.example.pafapp.service.CloudinaryService;
+import com.example.pafapp.service.CommentService;
 
 @RestController
 @RequestMapping("/api/ideas")
 @CrossOrigin(origins = "*")
-public class SkillSharingIdeaController {    @Autowired
+public class SkillSharingIdeaController {    
+    @Autowired
     private SkillSharingIdeaRepository repository;
     
     @Autowired
     private CloudinaryService cloudinaryService;
+    
+    @Autowired
+    private CommentService commentService;
     
     // Create a new SkillSharingIdea
     @PostMapping
@@ -98,8 +103,7 @@ public class SkillSharingIdeaController {    @Autowired
             // Update fields but preserve the original creation date
             updatedIdea.setTitle(idea.getTitle());
             updatedIdea.setDescription(idea.getDescription());
-            
-            // Update media fields if they exist in the request
+              // Update media fields if they exist in the request
             if (idea.getMediaUrl() != null) {
                 updatedIdea.setMediaUrl(idea.getMediaUrl());
             }
@@ -110,7 +114,8 @@ public class SkillSharingIdeaController {    @Autowired
                 updatedIdea.setPublicId(idea.getPublicId());
             }
             
-            // Don't update createdAt - keep the original date
+            // Preserve the likes count
+            // Don't update createdAt or likesCount - keep the original values
             return new ResponseEntity<>(repository.save(updatedIdea), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -159,8 +164,7 @@ public class SkillSharingIdeaController {    @Autowired
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-      // Delete a SkillSharingIdea
+    }    // Delete a SkillSharingIdea
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteIdea(@PathVariable("id") String id) {
         try {
@@ -179,6 +183,12 @@ public class SkillSharingIdeaController {    @Autowired
                         System.err.println("Failed to delete media from Cloudinary: " + e.getMessage());
                     }
                 }
+                  // Delete all comments associated with this idea
+                try {
+                    commentService.deleteByIdeaId(id);
+                } catch (Exception e) {
+                    System.err.println("Failed to delete associated comments: " + e.getMessage());
+                }
             }
             
             // Delete idea from database
@@ -186,6 +196,38 @@ public class SkillSharingIdeaController {    @Autowired
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // Like an idea
+    @PostMapping("/{id}/like")
+    public ResponseEntity<SkillSharingIdea> likeIdea(@PathVariable("id") String id) {
+        Optional<SkillSharingIdea> ideaData = repository.findById(id);
+        
+        if (ideaData.isPresent()) {
+            SkillSharingIdea idea = ideaData.get();
+            // Increment the likes count
+            idea.setLikesCount(idea.getLikesCount() + 1);
+            return new ResponseEntity<>(repository.save(idea), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // Unlike an idea (decrement likes)
+    @PostMapping("/{id}/unlike")
+    public ResponseEntity<SkillSharingIdea> unlikeIdea(@PathVariable("id") String id) {
+        Optional<SkillSharingIdea> ideaData = repository.findById(id);
+        
+        if (ideaData.isPresent()) {
+            SkillSharingIdea idea = ideaData.get();
+            // Only decrement if likes count is greater than 0
+            if (idea.getLikesCount() > 0) {
+                idea.setLikesCount(idea.getLikesCount() - 1);
+            }
+            return new ResponseEntity<>(repository.save(idea), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

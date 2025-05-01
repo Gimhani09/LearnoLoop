@@ -1,6 +1,8 @@
 // Global variables
 let allIdeas = [];
-const API_URL = '/api/ideas';
+const BASE_URL = window.location.origin;
+const API_URL = `${BASE_URL}/api/ideas`;
+const COMMENTS_API_URL = `${BASE_URL}/api/comments`;
 let editModal, deleteModal;
 
 // Wait for the document to be fully loaded
@@ -11,6 +13,9 @@ $(document).ready(function() {
     
     // Load all ideas when page loads
     fetchIdeas();
+    
+    // Initialize like buttons based on localStorage
+    initializeLikeButtons();
     
     // Handle form submission for new ideas
     $('#ideaForm').submit(function(e) {
@@ -146,8 +151,42 @@ function displayIdeas(ideas) {
                         </div>
                     </div>                    <div class="card-body">
                         <p class="card-text">${escapeHtml(idea.description)}</p>
-                        ${renderMedia(idea)}
-                        <p class="date-display mb-0">Posted on ${formattedDate}</p>
+                        ${renderMedia(idea)}                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="likes-container">                                <button class="btn btn-sm btn-outline-primary like-btn" data-id="${idea.id}">
+                                    <i class="fas fa-thumbs-up"></i> Like
+                                </button>
+                                <span class="ms-2 likes-count" data-id="${idea.id}">
+                                    <i class="fas fa-heart text-danger"></i> 
+                                    <strong>${idea.likesCount || 0}</strong> likes
+                                </span>
+                            </div>
+                            <p class="date-display mb-0">Posted on ${formattedDate}</p>
+                        </div>                        <hr>
+                        <!-- Comments Section -->
+                        <div class="comments-section">                            <h6 class="comment-toggle" role="button" data-id="${idea.id}" style="cursor: pointer;">
+                                <i class="fas fa-comments"></i> Comments 
+                                <span class="badge bg-secondary comment-count" data-id="${idea.id}">0</span>
+                                <i class="fas fa-chevron-down ms-2"></i>
+                            </h6>
+                            <div class="comments-wrapper" data-id="${idea.id}" style="display: none;">
+                                <div class="comments-container" data-id="${idea.id}">
+                                    <!-- Comments will be loaded here -->
+                                    <div class="text-center my-2 comments-loading">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form class="comment-form mt-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control comment-input" placeholder="Add a comment..." required>
+                                        <button class="btn btn-outline-primary add-comment-btn" type="submit" data-id="${idea.id}">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,17 +194,60 @@ function displayIdeas(ideas) {
         
         container.append(ideaCard);
     });
-    
-    // Add event listeners to dynamically created buttons
+      // Add event listeners to dynamically created buttons
     $('.edit-btn').click(function() {
         const ideaId = $(this).data('id');
         openEditModal(ideaId);
     });
-    
-    $('.delete-btn').click(function() {
+      $('.delete-btn').click(function() {
         const ideaId = $(this).data('id');
         openDeleteModal(ideaId);
     });
+      // Add event listener for like button
+    $('.like-btn').click(function() {
+        const ideaId = $(this).data('id');
+        likeIdea(ideaId);
+    });    // We need to delegate the event handler since the form is dynamically created
+    $(document).on('submit', '.comment-form', function(e) {
+        e.preventDefault();
+        const ideaId = $(this).find('.add-comment-btn').data('id');
+        const commentInput = $(this).find('.comment-input');
+        const commentText = commentInput.val().trim();
+        
+        console.log(`Comment form submitted for idea ${ideaId}, text: "${commentText}"`);
+        
+        if (commentText) {
+            console.log('Comment text is not empty, adding comment...');
+            addComment(ideaId, commentText);
+            commentInput.val(''); // Clear input after submission
+        } else {
+            console.log('Comment text is empty, not adding comment');
+            showToast('Warning', 'Please enter a comment before submitting', 'warning');
+        }
+    });// Add event handler for comment toggle
+    $(document).on('click', '.comment-toggle', function() {
+        const ideaId = $(this).data('id');
+        console.log(`Comment toggle clicked for idea ${ideaId}`);
+        
+        // Toggle visibility of comments section
+        const commentsWrapper = $(`.comments-wrapper[data-id="${ideaId}"]`);
+        commentsWrapper.slideToggle();
+        console.log(`Comments wrapper visibility toggled, now: ${commentsWrapper.is(':visible') ? 'visible' : 'hidden'}`);
+        
+        // Toggle the chevron icon
+        const chevron = $(this).find('.fas.fa-chevron-down, .fas.fa-chevron-up');
+        chevron.toggleClass('fa-chevron-down fa-chevron-up');
+        
+        // Load comments if not already loaded
+        if (!$(`.comments-container[data-id="${ideaId}"]`).hasClass('loaded')) {
+            console.log(`Comments for idea ${ideaId} not yet loaded, fetching now...`);
+            fetchComments(ideaId);
+            $(`.comments-container[data-id="${ideaId}"]`).addClass('loaded');
+        } else {
+            console.log(`Comments for idea ${ideaId} were already loaded`);
+        }
+    });// Initialize like buttons based on localStorage
+    initializeLikeButtons();
 }
 
 // Create a new idea
@@ -389,13 +471,15 @@ function filterIdeas() {
 // Sort ideas based on selected option
 function sortIdeas(sortOption) {
     let sortedIdeas = [...allIdeas];
-    
-    switch(sortOption) {
+      switch(sortOption) {
         case 'newest':
             sortedIdeas.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             break;
         case 'oldest':
             sortedIdeas.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            break;
+        case 'mostLiked':
+            sortedIdeas.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
             break;
         case 'titleAZ':
             sortedIdeas.sort((a, b) => a.title.localeCompare(b.title));
@@ -493,4 +577,280 @@ function renderMedia(idea) {
     }
     
     return '';
+}
+
+// Initialize like buttons based on localStorage
+function initializeLikeButtons() {
+    // This will be called after ideas are loaded
+    setTimeout(() => {
+        allIdeas.forEach(idea => {
+            const likeKey = `liked_${idea.id}`;
+            const isLiked = localStorage.getItem(likeKey) === 'true';
+            const likeButton = $(`.like-btn[data-id="${idea.id}"]`);
+            
+            if (isLiked) {
+                likeButton.addClass('liked');
+                likeButton.html('<i class="fas fa-thumbs-up"></i> Unlike');
+            }
+        });
+    }, 500); // Small delay to ensure DOM is updated
+}
+
+// Get comment count for an idea
+function getCommentCount(ideaId) {
+    $.ajax({
+        url: `${COMMENTS_API_URL}/count/idea/${ideaId}`,
+        type: 'GET',
+        success: function(data) {
+            // Update the comment count in the UI
+            $(`.comment-count[data-id="${ideaId}"]`).text(data.count || 0);
+        },
+        error: function(error) {
+            console.error('Error getting comment count:', error);
+        }
+    });
+}
+
+// Function to handle liking an idea
+function likeIdea(id) {
+    // Check if the idea has already been liked by this user in this session
+    const likeKey = `liked_${id}`;
+    const isLiked = localStorage.getItem(likeKey) === 'true';
+    
+    // URL for like or unlike action
+    const url = isLiked ? `${API_URL}/${id}/unlike` : `${API_URL}/${id}/like`;
+    
+    $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        success: function(data) {
+            // Update the like count in the UI without full refresh
+            const likesCountElement = $(`.likes-count[data-id="${id}"]`);
+            const likeButton = $(`.like-btn[data-id="${id}"]`);
+            
+            if (isLiked) {
+                // User is unliking
+                localStorage.removeItem(likeKey);
+                likeButton.removeClass('liked');
+                likeButton.html('<i class="fas fa-thumbs-up"></i> Like');
+                showToast('Success', 'You unliked this idea', 'info');
+            } else {                // User is liking
+                localStorage.setItem(likeKey, 'true');
+                likeButton.addClass('liked');
+                likeButton.html('<i class="fas fa-thumbs-up"></i> Unlike');
+                // Add animation class for heart beat effect
+                likesCountElement.addClass('like-animation');
+                // Remove animation class after animation completes
+                setTimeout(() => likesCountElement.removeClass('like-animation'), 1000);
+                showToast('Success', 'You liked this idea', 'success');
+            }
+              // Update the likes count with enhanced formatting
+            likesCountElement.html(`
+                <i class="fas fa-heart text-danger"></i> 
+                <strong>${data.likesCount}</strong> likes
+            `);
+            
+            // Update the idea in our local array
+            const ideaIndex = allIdeas.findIndex(idea => idea.id === id);
+            if (ideaIndex !== -1) {
+                allIdeas[ideaIndex].likesCount = data.likesCount;
+            }
+        },        error: function(error) {
+            console.error('Error liking/unliking idea:', error);
+            showToast('Error', 'Failed to update like status. Please try again.', 'danger');
+        }
+    });
+}    // Fetch comments for a specific idea
+function fetchComments(ideaId) {
+    const commentsContainer = $(`.comments-container[data-id="${ideaId}"]`);
+    const loadingSpinner = commentsContainer.find('.comments-loading');
+    
+    console.log(`Fetching comments for idea ${ideaId} from ${COMMENTS_API_URL}/idea/${ideaId}`);
+    loadingSpinner.show();
+    
+    $.ajax({
+        url: `${COMMENTS_API_URL}/idea/${ideaId}`,
+        type: 'GET',
+        success: function(comments) {
+            console.log(`Received ${comments.length} comments for idea ${ideaId}`);
+            loadingSpinner.hide();
+            
+            // Update comment count badge
+            $(`.comment-count[data-id="${ideaId}"]`).text(comments.length);
+            
+            if (comments.length === 0) {
+                commentsContainer.append('<p class="text-muted small no-comments">No comments yet. Be the first to comment!</p>');
+                return;
+            }
+            
+            // Clear any "no comments" message
+            commentsContainer.find('.no-comments').remove();
+            
+            // Display comments
+            comments.forEach(comment => {
+                displayComment(commentsContainer, comment);
+            });
+        },        error: function(error) {
+            console.error('Error fetching comments:', error);
+            console.error(`Status code: ${error.status}, Status text: ${error.statusText}`);
+            loadingSpinner.hide();
+            commentsContainer.append('<p class="text-danger small">Failed to load comments. Please refresh and try again.</p>');
+            showToast('Error', 'Failed to load comments. Please try again.', 'danger');
+        }
+    });
+}
+
+// Display a single comment
+function displayComment(container, comment) {
+    // Check if comment already exists to avoid duplicates
+    if (container.find(`[data-comment-id="${comment.id}"]`).length > 0) {
+        return;
+    }
+    
+    const formattedDate = new Date(comment.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    const commentHTML = `
+        <div class="comment fade-in mb-2" data-comment-id="${comment.id}">
+            <div class="d-flex justify-content-between">
+                <strong class="comment-author">${escapeHtml(comment.author || 'Anonymous')}</strong>
+                <small class="text-muted">${formattedDate}</small>
+            </div>
+            <p class="comment-content mb-1">${escapeHtml(comment.content)}</p>
+            <div class="comment-actions small">
+                <a href="#" class="text-danger delete-comment-link" data-id="${comment.id}">Delete</a>
+            </div>
+            <hr class="mt-2 mb-2">
+        </div>
+    `;
+    
+    container.append(commentHTML);
+    
+    // Add event listener for delete comment link
+    container.find(`.delete-comment-link[data-id="${comment.id}"]`).click(function(e) {
+        e.preventDefault();
+        const commentId = $(this).data('id');
+        deleteComment(commentId);
+    });
+}    // Add a new comment
+function addComment(ideaId, content) {
+    // Simple username input - in a real app, you'd have proper user authentication
+    const author = prompt('Enter your name (or leave empty for "Anonymous"):', '');
+    
+    const comment = {
+        ideaId: ideaId,
+        content: content,
+        author: author || 'Anonymous'
+    };
+    
+    console.log(`Adding comment to idea ${ideaId} at ${COMMENTS_API_URL}/idea/${ideaId}`, comment);
+    
+    $.ajax({
+        url: `${COMMENTS_API_URL}/idea/${ideaId}`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(comment),
+        success: function(newComment) {
+            const commentsContainer = $(`.comments-container[data-id="${ideaId}"]`);
+            
+            // Remove "no comments" message if present
+            commentsContainer.find('.no-comments').remove();
+            
+            // Display the new comment
+            displayComment(commentsContainer, newComment);
+            
+            // Update comment count
+            const currentCount = parseInt($(`.comment-count[data-id="${ideaId}"]`).text()) || 0;
+            $(`.comment-count[data-id="${ideaId}"]`).text(currentCount + 1);
+            
+            showToast('Success', 'Your comment has been added!', 'success');
+        },        error: function(error) {
+            console.error('Error adding comment:', error);
+            console.error(`Status code: ${error.status}, Status text: ${error.statusText}`);
+            console.error(`Response text: ${error.responseText || 'No response text'}`);
+            showToast('Error', 'Failed to add your comment. Please try again.', 'danger');
+        }
+    });
+}
+
+// Delete a comment
+// Function to show toast notifications
+function showToast(title, message, type) {
+    // Create toast container if it doesn't exist
+    if ($('#toast-container').length === 0) {
+        $('body').append('<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>');
+    }
+    
+    // Generate a unique ID for the toast
+    const toastId = 'toast-' + new Date().getTime();
+    
+    // Create toast HTML
+    const toast = `
+    <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-${type} text-white">
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    </div>
+    `;
+    
+    // Add toast to container
+    $('#toast-container').append(toast);
+    
+    // Initialize and show the toast
+    const toastElement = new bootstrap.Toast(document.getElementById(toastId), {
+        autohide: true,
+        delay: 3000
+    });
+    toastElement.show();
+    
+    // Remove toast element after it's hidden
+    $(`#${toastId}`).on('hidden.bs.toast', function() {
+        $(this).remove();
+    });
+}
+
+function deleteComment(commentId) {
+    if (!confirm('Are you sure you want to delete this comment?')) {
+        return;
+    }
+    
+    $.ajax({
+        url: `${COMMENTS_API_URL}/${commentId}`,
+        type: 'DELETE',
+        success: function(response) {
+            // Remove the comment from the DOM
+            const commentElement = $(`[data-comment-id="${commentId}"]`);
+            const ideaId = commentElement.closest('.comments-container').data('id');
+            
+            commentElement.fadeOut(300, function() {
+                $(this).remove();
+                
+                // Update comment count
+                const currentCount = parseInt($(`.comment-count[data-id="${ideaId}"]`).text()) || 0;
+                $(`.comment-count[data-id="${ideaId}"]`).text(Math.max(0, currentCount - 1));
+                
+                // Show "no comments" message if this was the last comment
+                const commentsContainer = $(`.comments-container[data-id="${ideaId}"]`);
+                if (commentsContainer.children('.comment').length === 0) {
+                    commentsContainer.append('<p class="text-muted small no-comments">No comments yet. Be the first to comment!</p>');
+                }
+            });
+            
+            showToast('Success', 'Comment deleted successfully', 'success');
+        },
+        error: function(error) {
+            console.error('Error deleting comment:', error);
+            showToast('Error', 'Failed to delete comment. Please try again.', 'danger');
+        }
+    });
 }
