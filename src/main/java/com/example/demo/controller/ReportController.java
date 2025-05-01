@@ -56,6 +56,15 @@ public class ReportController {
         Report savedReport = reportRepository.save(report);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);
     }
+<<<<<<< Updated upstream
+=======
+    
+    @GetMapping("/reports/user/{userId}")
+public ResponseEntity<?> getReportsByUserId(@PathVariable String userId) {
+    List<Report> reports = reportRepository.findByReportedByUserId(userId);
+    return ResponseEntity.ok(reports);
+}
+>>>>>>> Stashed changes
 
     @GetMapping("/reports/post/{postId}")
     public ResponseEntity<?> getReportsByPostId(@PathVariable String postId) {

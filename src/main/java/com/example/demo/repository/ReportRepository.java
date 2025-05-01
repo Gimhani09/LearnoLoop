@@ -7,5 +7,9 @@ import java.util.List;
 public interface ReportRepository extends MongoRepository<Report, String> {
     List<Report> findByPostId(String postId);
     List<Report> findByStatus(String status);
+<<<<<<< Updated upstream
+=======
+    List<Report> findByReportedByUserId(String reportedByUserId);
+>>>>>>> Stashed changes
     List<Report> findByPostIdAndReportedByUserId(String postId, String reportedByUserId);
 } 
