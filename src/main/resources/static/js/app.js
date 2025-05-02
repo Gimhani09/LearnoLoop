@@ -617,8 +617,9 @@ function likeIdea(id) {
     const likeKey = `liked_${id}`;
     const isLiked = localStorage.getItem(likeKey) === 'true';
     
-    // URL for like or unlike action
-    const url = isLiked ? `${API_URL}/${id}/unlike` : `${API_URL}/${id}/like`;
+    // URL for like or unlike action - using the new LikeController endpoints
+    const LIKES_API_URL = `${BASE_URL}/api/likes`;
+    const url = isLiked ? `${LIKES_API_URL}/${id}/unlike` : `${LIKES_API_URL}/${id}/like`;
     
     $.ajax({
         url: url,
@@ -661,7 +662,7 @@ function likeIdea(id) {
             showToast('Error', 'Failed to update like status. Please try again.', 'danger');
         }
     });
-}    // Fetch comments for a specific idea
+}// Fetch comments for a specific idea
 function fetchComments(ideaId) {
     const commentsContainer = $(`.comments-container[data-id="${ideaId}"]`);
     const loadingSpinner = commentsContainer.find('.comments-loading');

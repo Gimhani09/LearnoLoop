@@ -198,36 +198,5 @@ public class SkillSharingIdeaController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
-    // Like an idea
-    @PostMapping("/{id}/like")
-    public ResponseEntity<SkillSharingIdea> likeIdea(@PathVariable("id") String id) {
-        Optional<SkillSharingIdea> ideaData = repository.findById(id);
-        
-        if (ideaData.isPresent()) {
-            SkillSharingIdea idea = ideaData.get();
-            // Increment the likes count
-            idea.setLikesCount(idea.getLikesCount() + 1);
-            return new ResponseEntity<>(repository.save(idea), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-    
-    // Unlike an idea (decrement likes)
-    @PostMapping("/{id}/unlike")
-    public ResponseEntity<SkillSharingIdea> unlikeIdea(@PathVariable("id") String id) {
-        Optional<SkillSharingIdea> ideaData = repository.findById(id);
-        
-        if (ideaData.isPresent()) {
-            SkillSharingIdea idea = ideaData.get();
-            // Only decrement if likes count is greater than 0
-            if (idea.getLikesCount() > 0) {
-                idea.setLikesCount(idea.getLikesCount() - 1);
-            }
-            return new ResponseEntity<>(repository.save(idea), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+      // Like/unlike functionality moved to LikeController
 }
