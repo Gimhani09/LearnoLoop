@@ -1,64 +1,94 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Comment;
-import com.example.demo.service.CommentService;
+import com.example.demo.repository.CommentRepository;
+import com.example.demo.repository.PostRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comments")
+@CrossOrigin(origins = "${app.cors.allowed-origins}")
 public class CommentController {
 
     @Autowired
-    private CommentService commentService;
-
-    @GetMapping
-    public ResponseEntity<List<Comment>> getAllComments() {
-        return new ResponseEntity<>(commentService.getAllComments(), HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Comment> getCommentById(@PathVariable String id) {
-        Optional<Comment> comment = commentService.getCommentById(id);
-        return comment.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+    private CommentRepository commentRepository;
     
-    @GetMapping("/skill/{skillId}")
-    public ResponseEntity<List<Comment>> getCommentsBySkillId(@PathVariable String skillId) {
-        return new ResponseEntity<>(commentService.getCommentsBySkillId(skillId), HttpStatus.OK);
+    @Autowired
+    private PostRepository postRepository;
+
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<?> getCommentsByPostId(@PathVariable String postId) {
+        // Check if post exists
+        if (!postRepository.existsById(postId)) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        return ResponseEntity.ok(comments);
     }
     
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Comment>> getCommentsByUserId(@PathVariable String userId) {
-        return new ResponseEntity<>(commentService.getCommentsByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<?> getCommentsByUserId(@PathVariable String userId) {
+        List<Comment> comments = commentRepository.findByUserId(userId);
+        return ResponseEntity.ok(comments);
     }
-
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCommentById(@PathVariable String id) {
+        return commentRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
-        return new ResponseEntity<>(commentService.createComment(comment), HttpStatus.CREATED);
+    public ResponseEntity<?> createComment(@RequestBody Comment comment) {
+        // Validate required fields
+        if (comment.getPostId() == null || comment.getUserId() == null || comment.getText() == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields: postId, userId, text"));
+        }
+        
+        // Check if post exists
+        if (!postRepository.existsById(comment.getPostId())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Post not found"));
+        }
+        
+        // Set creation timestamp
+        comment.setCreatedAt(LocalDateTime.now());
+        
+        Comment savedComment = commentRepository.save(comment);
+        return ResponseEntity.ok(savedComment);
     }
-
+    
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> updateComment(@PathVariable String id, @RequestBody Comment comment) {
-        Comment updatedComment = commentService.updateComment(id, comment);
-        if (updatedComment != null) {
-            return new ResponseEntity<>(updatedComment, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> updateComment(@PathVariable String id, @RequestBody Comment updatedComment) {
+        return commentRepository.findById(id)
+                .map(comment -> {
+                    // Only allow updating the text
+                    if (updatedComment.getText() != null) {
+                        comment.setText(updatedComment.getText());
+                    }
+                    comment.setUpdatedAt(LocalDateTime.now());
+                    
+                    Comment saved = commentRepository.save(comment);
+                    return ResponseEntity.ok(saved);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
-
+    
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable String id, @RequestParam String userId) {
-        boolean deleted = commentService.deleteComment(id, userId);
-        if (deleted) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> deleteComment(@PathVariable String id) {
+        return commentRepository.findById(id)
+                .map(comment -> {
+                    commentRepository.delete(comment);
+                    return ResponseEntity.ok(Map.of("message", "Comment deleted successfully"));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
