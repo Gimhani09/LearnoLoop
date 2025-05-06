@@ -19,4 +19,41 @@ public class ReportRequest {
     @NotBlank(message = "Description is required")
     @Size(min = 10, max = 500, message = "Description must be between 10 and 500 characters")
     private String description;
-} 
+    
+    // Default constructor required by Spring
+    public ReportRequest() {
+    }
+    
+    // Getter and setter methods in case Lombok is not working properly
+    public String getPostId() {
+        return postId;
+    }
+    
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
+    
+    public String getReportedByUserId() {
+        return reportedByUserId;
+    }
+    
+    public void setReportedByUserId(String reportedByUserId) {
+        this.reportedByUserId = reportedByUserId;
+    }
+    
+    public String getReason() {
+        return reason;
+    }
+    
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}

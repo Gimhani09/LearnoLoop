@@ -16,30 +16,20 @@ public class PostController {
     private PostRepository postRepository;
 
     @GetMapping("/posts")
-<<<<<<< Updated upstream
-    public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-=======
     public ResponseEntity<?> getAllPosts() {
         List<Post> posts = postRepository.findAll();
         if (posts.isEmpty()) {
             return ResponseEntity.status(404).body("No posts available.");
         }
->>>>>>> Stashed changes
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/posts/active")
-<<<<<<< Updated upstream
-    public ResponseEntity<List<Post>> getActivePosts() {
-        List<Post> posts = postRepository.findByStatus("ACTIVE");
-=======
     public ResponseEntity<?> getActivePosts() {
         List<Post> posts = postRepository.findByStatus("ACTIVE");
         if (posts.isEmpty()) {
             return ResponseEntity.status(404).body("No active posts available.");
         }
->>>>>>> Stashed changes
         return ResponseEntity.ok(posts);
     }
 
@@ -51,13 +41,6 @@ public class PostController {
     }
 
     @GetMapping("/posts/user/{userId}")
-<<<<<<< Updated upstream
-    public ResponseEntity<List<Post>> getPostsByUserId(@PathVariable String userId) {
-        List<Post> posts = postRepository.findByUserId(userId);
-        return ResponseEntity.ok(posts);
-    }
-} 
-=======
     public ResponseEntity<?> getPostsByUserId(@PathVariable String userId) {
         List<Post> posts = postRepository.findByUserId(userId);
         if (posts.isEmpty()) {
@@ -66,4 +49,3 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 }
->>>>>>> Stashed changes

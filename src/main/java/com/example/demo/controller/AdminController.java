@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "${app.cors.allowed-origins}")
+@CrossOrigin(origins = "${app.cors.allowed-origins}", allowCredentials = "true")
 public class AdminController {
 
     @Autowired
@@ -78,4 +78,4 @@ public class AdminController {
         Report updatedReport = reportRepository.save(report);
         return ResponseEntity.ok(updatedReport);
     }
-} 
+}
