@@ -71,15 +71,13 @@ const AdminDashboard = ({ user }) => {
     useEffect(() => {
         if (user && user.role === 'ADMIN') {
             if (mainTabValue === 0) {
-                // Fetch reports and posts only when tab is active
                 fetchReports();
                 fetchPosts();
             } else if (mainTabValue === 1) {
-                // Fetch quizzes only when quiz tab is active
                 fetchQuizzes();
             }
         }
-    }, [mainTabValue]); // Remove tabValue dependency to prevent excessive re-renders
+    }, [mainTabValue, tabValue]); // Remove user?.id from dependencies to prevent extra fetches
 
     const fetchPosts = async () => {
         try {
@@ -141,18 +139,15 @@ const AdminDashboard = ({ user }) => {
 
     const fetchQuizzes = async () => {
         setLoading(true);
-        setError(null);
-        
+        setError(null); // Reset error state at the start of fetching
         try {
             const response = await api.getQuizzes();
-            
-            if (response && Array.isArray(response.data)) {
-                // Ensure we always have an array, even if empty
+            if (response && response.data) {
                 setQuizzes(response.data);
                 
-                // Calculate quiz stats safely with null checks
+                // Calculate quiz stats
                 const totalQuizzes = response.data.length;
-                const publishedQuizzes = response.data.filter(q => q.published).length;
+                const publishedQuizzes = response.data.filter(q => q.isPublished).length;
                 const drafts = totalQuizzes - publishedQuizzes;
                 const totalAttempts = response.data.reduce((sum, quiz) => sum + (quiz.totalAttempts || 0), 0);
                 
@@ -162,28 +157,17 @@ const AdminDashboard = ({ user }) => {
                     drafts,
                     totalAttempts
                 });
-            } else {
-                // Handle invalid data format
-                setQuizzes([]);
-                setError("Received invalid quiz data format from server");
-                setQuizStats({
-                    totalQuizzes: 0,
-                    publishedQuizzes: 0,
-                    drafts: 0,
-                    totalAttempts: 0
-                });
+                
+                // Check if we're using mock data by examining the IDs
+                const hasMockData = response.data.some(quiz => quiz.id.startsWith('mock'));
+                if (hasMockData) {
+                    // Show an info message instead of an error for mock data
+                    setError(null);
+                }
             }
         } catch (error) {
             console.error('Error fetching quizzes:', error);
             setError('Failed to load quizzes. Please try again later.');
-            // Set empty state on error
-            setQuizzes([]);
-            setQuizStats({
-                totalQuizzes: 0,
-                publishedQuizzes: 0,
-                drafts: 0,
-                totalAttempts: 0
-            });
         } finally {
             setLoading(false);
         }
@@ -273,7 +257,7 @@ const AdminDashboard = ({ user }) => {
     const handlePublishToggle = async (quiz) => {
         try {
             const quizId = quiz.id;
-            if (quiz.published) {
+            if (quiz.isPublished) {
                 await api.unpublishQuiz(quizId);
             } else {
                 await api.publishQuiz(quizId);
@@ -684,8 +668,8 @@ const AdminDashboard = ({ user }) => {
                                             <TableCell>{quiz.questions?.length || 0}</TableCell>
                                             <TableCell>
                                                 <Chip
-                                                    label={quiz.published ? 'Published' : 'Draft'}
-                                                    color={quiz.published ? 'success' : 'warning'}
+                                                    label={quiz.isPublished ? 'Published' : 'Draft'}
+                                                    color={quiz.isPublished ? 'success' : 'warning'}
                                                     size="small"
                                                 />
                                             </TableCell>
@@ -705,24 +689,24 @@ const AdminDashboard = ({ user }) => {
                                                             <EditIcon />
                                                         </IconButton>
                                                     </Tooltip>
-                                                    <Tooltip title={quiz.published ? "Unpublish" : "Publish"}>
+                                                    <Tooltip title={quiz.isPublished ? "Unpublish" : "Publish"}>
                                                         {quiz.questions?.length === 0 ? (
                                                             <span>
                                                                 <IconButton 
-                                                                    color={quiz.published ? "warning" : "success"}
+                                                                    color={quiz.isPublished ? "warning" : "success"}
                                                                     size="small"
                                                                     disabled={true}
                                                                 >
-                                                                    {quiz.published ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                                    {quiz.isPublished ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                                                 </IconButton>
                                                             </span>
                                                         ) : (
                                                             <IconButton 
-                                                                color={quiz.published ? "warning" : "success"}
+                                                                color={quiz.isPublished ? "warning" : "success"}
                                                                 size="small"
                                                                 onClick={() => handlePublishToggle(quiz)}
                                                             >
-                                                                {quiz.published ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                                {quiz.isPublished ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                                             </IconButton>
                                                         )}
                                                     </Tooltip>

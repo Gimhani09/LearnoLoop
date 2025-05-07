@@ -37,7 +37,7 @@ const UserReports = ({ user }) => {
             fetchUserReports();
             fetchPosts();
         }
-    }, [user]);
+    }, [user && user.id]); // Only re-run when user ID changes
 
     const fetchUserReports = async () => {
         if (!user) return;

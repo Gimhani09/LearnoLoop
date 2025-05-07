@@ -41,8 +41,10 @@ const AdminQuizzes = ({ user }) => {
   const fetchQuizzes = async () => {
     setLoading(true);
     try {
-      const response = await api.getQuizzes();
+      // Use the admin-specific endpoint to get all quizzes including unpublished ones
+      const response = await api.get('/quizzes/admin');
       if (response?.data) {
+        console.log("Fetched quizzes:", response.data);
         setQuizzes(response.data);
       }
     } catch (err) {
@@ -63,16 +65,25 @@ const AdminQuizzes = ({ user }) => {
       if (newStatus) {
         // Publish quiz
         response = await api.publishQuiz(quizId);
+        console.log("Publish response:", response);
       } else {
         // Unpublish quiz
         response = await api.unpublishQuiz(quizId);
+        console.log("Unpublish response:", response);
       }
       
       if (response?.data) {
-        // Update the quiz in the state
-        setQuizzes(prevQuizzes => prevQuizzes.map(quiz => 
-          quiz.id === quizId ? { ...quiz, published: newStatus } : quiz
-        ));
+        // Update the quiz in the state with the returned data if available
+        if (response.data.quiz) {
+          setQuizzes(prevQuizzes => prevQuizzes.map(quiz => 
+            quiz.id === quizId ? response.data.quiz : quiz
+          ));
+        } else {
+          // Otherwise just update the isPublished status
+          setQuizzes(prevQuizzes => prevQuizzes.map(quiz => 
+            quiz.id === quizId ? { ...quiz, isPublished: newStatus } : quiz
+          ));
+        }
         
         setSuccessMessage(`Quiz ${newStatus ? 'published' : 'unpublished'} successfully`);
         
@@ -83,7 +94,19 @@ const AdminQuizzes = ({ user }) => {
       }
     } catch (err) {
       console.error("Error toggling quiz status:", err);
-      setError(`Failed to ${currentStatus ? 'unpublish' : 'publish'} quiz: ${err.message || 'Unknown error'}`);
+      // Show a more descriptive error message
+      let errorMsg = `Failed to ${currentStatus ? 'unpublish' : 'publish'} quiz`;
+      
+      // Extract error message from response if available
+      if (err.response && err.response.data && err.response.data.error) {
+        errorMsg += `: ${err.response.data.error}`;
+      } else if (err.message) {
+        errorMsg += `: ${err.message}`;
+      } else {
+        errorMsg += `. Please try again.`;
+      }
+      
+      setError(errorMsg);
       
       // Clear error after delay
       setTimeout(() => {
@@ -108,25 +131,42 @@ const AdminQuizzes = ({ user }) => {
     if (!confirmDelete) return;
     
     try {
-      await api.deleteQuiz(confirmDelete);
+      const response = await api.deleteQuiz(confirmDelete);
+      console.log("Delete response:", response);
       
-      // Remove quiz from the state
-      setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz.id !== confirmDelete));
-      
-      setSuccessMessage("Quiz deleted successfully");
-      
-      // Clear success message after delay
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      if (response?.data?.success) {
+        // Remove quiz from the state
+        setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz.id !== confirmDelete));
+        
+        setSuccessMessage("Quiz deleted successfully");
+        
+        // Clear success message after delay
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        throw new Error("Failed to delete quiz. Server did not confirm success.");
+      }
     } catch (err) {
       console.error("Error deleting quiz:", err);
-      setError("Failed to delete quiz. Please try again.");
+      // Show a more descriptive error message
+      let errorMsg = "Failed to delete quiz";
+      
+      // Extract error message from response if available
+      if (err.response && err.response.data && err.response.data.error) {
+        errorMsg += `: ${err.response.data.error}`;
+      } else if (err.message) {
+        errorMsg += `: ${err.message}`;
+      } else {
+        errorMsg += `. Please try again.`;
+      }
+      
+      setError(errorMsg);
       
       // Clear error after delay
       setTimeout(() => {
         setError(null);
-      }, 3000);
+      }, 5000);
     } finally {
       setConfirmDelete(null);
     }
@@ -273,8 +313,8 @@ const AdminQuizzes = ({ user }) => {
                   
                   <TableCell align="center">
                     <Switch
-                      checked={quiz.published}
-                      onChange={() => handleTogglePublished(quiz.id, quiz.published)}
+                      checked={quiz.isPublished}
+                      onChange={() => handleTogglePublished(quiz.id, quiz.isPublished)}
                       color="success"
                       disabled={toggleLoading[quiz.id]}
                       icon={<VisibilityOffIcon fontSize="small" />}
