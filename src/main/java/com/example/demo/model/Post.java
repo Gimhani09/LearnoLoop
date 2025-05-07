@@ -18,14 +18,14 @@ public class Post {
     @Id
     private String id;
 
-    @NotBlank(message = "Title is mandatory")
-    @Size(max = 100, message = "Title cannot exceed 100 characters")
+    @NotBlank(message = "Title is mandatory....")
+    @Size(max = 100, message = "Title cannot exceed 100 characters....")
     private String title;
 
-    @NotBlank(message = "Photo URL is mandatory")
+    @NotBlank(message = "Photo URL is mandatory...")
     private String photoUrl;
 
-    @NotBlank(message = "Description is mandatory")
-    @Size(max = 500, message = "Description cannot exceed 500 characters")
+    @NotBlank(message = "Description is mandatory....")
+    @Size(max = 500, message = "Description cannot exceed 500 characters....")
     private String description;
 }
