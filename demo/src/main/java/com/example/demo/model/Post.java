@@ -2,30 +2,39 @@ package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
-@Document(collection = "posts")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Document(collection = "posts")
 public class Post {
     @Id
     private String id;
-
-    @NotBlank(message = "Title is mandatory")
-    @Size(max = 100, message = "Title cannot exceed 100 characters")
+    
     private String title;
-
-    @NotBlank(message = "Photo URL is mandatory")
     private String photoUrl;
-
-    @NotBlank(message = "Description is mandatory")
-    @Size(max = 500, message = "Description cannot exceed 500 characters")
+    private String photoPublicId; // Added to store Cloudinary public ID
+    
+    // Added video support
+    private String videoUrl;
+    private String videoPublicId;
+    
     private String description;
+    private String _class;
+    private int reportCount;
+    private String status = "ACTIVE"; // Default status
+    private String userId; // User who created the post
+    
+    // Added timestamps for tracking
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // Added username for display purposes
+    private String username;
+    
+    // LearnoLoop educational fields
+    private String category;
+    private String level;
+    private Integer estimatedTime; // Reading time in minutes
+    private String learningGoals;
 }
