@@ -1,0 +1,131 @@
+/* Quiz List Page Specific Styles */
+.quiz-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  position: relative;
+}
+
+.quiz-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.quiz-card:hover .quiz-image {
+  transform: scale(1.05);
+}
+
+.quiz-image {
+  transition: transform 0.5s ease;
+}
+
+.quiz-tag {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.quiz-stat-badge {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  background-color: var(--surface-bg);
+}
+
+.quiz-progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--surface-light);
+}
+
+.quiz-progress-bar .MuiLinearProgress-bar {
+  border-radius: 3px;
+}
+
+.quiz-button {
+  text-transform: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.quiz-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.2), transparent 70%);
+  transform: translateX(-100%);
+}
+
+.quiz-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+}
+
+.quiz-button:hover::after {
+  transform: translateX(100%);
+  transition: transform 0.75s ease;
+}
+
+/* Category color schemes */
+.category-programming { background: linear-gradient(45deg, #4A00E0, #8E2DE2); }
+.category-mathematics { background: linear-gradient(45deg, #1E88E5, #64B5F6); }
+.category-science { background: linear-gradient(45deg, #00BFA5, #69F0AE); }
+.category-language { background: linear-gradient(45deg, #FF5722, #FF8A65); }
+.category-history { background: linear-gradient(45deg, #FFC107, #FFE082); }
+.category-art { background: linear-gradient(45deg, #E91E63, #F48FB1); }
+.category-business { background: linear-gradient(45deg, #3949AB, #7986CB); }
+.category-data-science { background: linear-gradient(45deg, #00ACC1, #4DD0E1); }
+.category-general { background: linear-gradient(45deg, #6200EA, #B388FF); }
+
+/* Quiz header styles */
+.quiz-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.quiz-header-title {
+  font-weight: 700;  font-size: clamp(1.75rem, 4vw, 2rem);
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .quiz-header {
+    align-items: stretch;
+  }
+  
+  .quiz-filter-container {
+    flex-direction: column;
+    width: 100%;
+  }
+}
