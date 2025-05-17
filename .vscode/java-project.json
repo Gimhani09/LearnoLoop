@@ -1,0 +1,8 @@
+{
+    "java.project.sourcePaths": [
+        "src/main/java"
+    ],
+    "java.project.referencedLibraries": [],
+    "java.project.outputPath": "target/classes",
+    "java.dependency.packagePresentation": "hierarchical"
+}
