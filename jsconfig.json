@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "checkJs": false,
+    "module": "commonjs",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/main/java/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/node_modules/*"]
+}
