@@ -3,17 +3,23 @@ import {
   Container, Typography, Box, Paper, Button, CircularProgress, Stepper,
   Step, StepLabel, StepContent, Radio, RadioGroup, FormControlLabel, FormControl,
   FormLabel, Checkbox, FormGroup, Alert, Dialog, DialogTitle, DialogContent, 
-  DialogContentText, DialogActions, LinearProgress, Divider, Chip
+  DialogContentText, DialogActions, LinearProgress, Divider, Chip, useTheme, useMediaQuery,
+  Avatar, alpha
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import QuizIcon from '@mui/icons-material/Quiz';
-import TimerIcon from '@mui/icons-material/Timer';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import BadgeNotification from './BadgeNotification';
 import { useNotification } from '../context/NotificationContext';
 
@@ -21,6 +27,9 @@ const Quiz = ({ user }) => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const { notifySuccess, notifyError, notifyInfo, notifyWarning } = useNotification();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +45,7 @@ const Quiz = ({ user }) => {
   const [attemptId, setAttemptId] = useState(null);
   const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
   const [newBadges, setNewBadges] = useState([]);
+  const [questionHovered, setQuestionHovered] = useState(null);
   
   const timerRef = useRef(null);
   
@@ -611,15 +621,55 @@ const Quiz = ({ user }) => {
       </Container>
     );
   }
-
   // Render loading state
   if (loading) {
     return (
-      <Container sx={{ py: 4, textAlign: 'center' }}>
-        <CircularProgress />
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Loading quiz...
-        </Typography>
+      <Container 
+        sx={{ 
+          py: { xs: 6, md: 8 }, 
+          textAlign: 'center',
+          px: isMobile ? 2 : undefined
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 6,
+            opacity: 0.8
+          }}
+          className="fade-in"
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 3
+            }}
+          >
+            <CircularProgress thickness={4} size={40} sx={{ color: 'var(--primary-color)' }} />
+          </Box>
+          
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 500,
+              color: 'var(--text-secondary)'
+            }}
+          >
+            Preparing your learning quiz...
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto', mt: 1 }}>
+            Loading questions and setting up the quiz environment
+          </Typography>
+        </Box>
       </Container>
     );
   }
@@ -627,80 +677,326 @@ const Quiz = ({ user }) => {
   // Render error state
   if (error || !quiz) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error || "Quiz not found"}
-        </Alert>
-        <Button variant="outlined" onClick={() => navigate('/quizzes')}>
-          Back to Quizzes
-        </Button>
+      <Container sx={{ py: 6, px: isMobile ? 2 : undefined }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, md: 4 },
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-light)',
+            maxWidth: 600,
+            mx: 'auto'
+          }}
+          className="fade-in"
+        >
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            <Avatar
+              sx={{
+                bgcolor: alpha(theme.palette.error.main, 0.1),
+                color: 'error.main',
+                mr: 2,
+                width: 48,
+                height: 48
+              }}
+            >
+              <ErrorOutlineIcon fontSize="medium" />
+            </Avatar>
+            <Typography variant="h5" fontWeight={600} color="error.main">
+              Quiz Error
+            </Typography>
+          </Box>
+          
+          <Typography 
+            variant="body1" 
+            paragraph
+            sx={{ 
+              fontSize: '1rem',
+              mb: 3
+            }}
+          >
+            {error || "We couldn't load this quiz. It may have been removed or you don't have permission to access it."}
+          </Typography>
+          
+          <Button 
+            variant="outlined" 
+            onClick={() => navigate('/quizzes')}
+            startIcon={<ArrowBackOutlinedIcon />}
+            className="btn-secondary"
+            sx={{ 
+              borderRadius: 'var(--radius-md)', 
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 3
+            }}
+          >
+            Back to Quizzes
+          </Button>
+        </Paper>
       </Container>
     );
   }
-  
-  // Render quiz intro screen
+    // Render quiz intro screen
   if (!quizStarted) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <Typography variant="h4" gutterBottom>{quiz.title}</Typography>
-          <Chip 
-            label={quiz.category} 
-            color="primary"
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-          <Typography variant="body1" paragraph>{quiz.description}</Typography>
-          
-          <Divider sx={{ my: 3 }} />
-          
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 2, sm: 0 } }}>
-              <QuizIcon sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="body1">
-                <strong>{quiz.questions.length}</strong> Questions
-              </Typography>
-            </Box>
+      <Container 
+        maxWidth="md" 
+        sx={{ 
+          py: { xs: 4, md: 6 },
+          px: isMobile ? 2 : undefined 
+        }}
+      >
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            border: '1px solid var(--border-light)'
+          }}
+          className="fade-in"
+        >
+          {/* Quiz header with gradient background based on category */}
+          <Box 
+            sx={{
+              py: 4,
+              px: { xs: 3, md: 5 },
+              background: quiz.category === "Programming" ? 
+                'linear-gradient(45deg, #4A00E0, #8E2DE2)' : 
+                quiz.category === "Mathematics" ?
+                'linear-gradient(45deg, #1E88E5, #64B5F6)' :
+                quiz.category === "Science" ?
+                'linear-gradient(45deg, #00BFA5, #69F0AE)' :
+                quiz.category === "Language" ?
+                'linear-gradient(45deg, #FF5722, #FF8A65)' :
+                quiz.category === "History" ?
+                'linear-gradient(45deg, #FFC107, #FFE082)' :
+                quiz.category === "Art" ?
+                'linear-gradient(45deg, #E91E63, #F48FB1)' :
+                quiz.category === "Business" ?
+                'linear-gradient(45deg, #3949AB, #7986CB)' :
+                quiz.category === "Data Science" ?
+                'linear-gradient(45deg, #00ACC1, #4DD0E1)' :
+                'linear-gradient(45deg, #6200EA, #B388FF)',
+              color: 'white',
+              textAlign: 'center',
+              position: 'relative'
+            }}
+          >
+            <Avatar
+              sx={{
+                width: 80,
+                height: 80,
+                bgcolor: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)',
+                mx: 'auto',
+                mb: 2,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              }}
+            >
+              <QuizOutlinedIcon sx={{ fontSize: 40 }} />
+            </Avatar>
             
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 2, sm: 0 } }}>
-              <TimerIcon sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="body1">
-                <strong>{quiz.timeLimit > 0 ? `${quiz.timeLimit} minutes` : 'No time limit'}</strong>
-              </Typography>
-            </Box>
+            <Chip
+              label={quiz.category}
+              size="small"
+              sx={{
+                position: 'absolute',
+                top: 20,
+                right: 20,
+                bgcolor: 'rgba(255,255,255,0.15)',
+                color: 'white',
+                backdropFilter: 'blur(10px)',
+                fontWeight: 500,
+                px: 1
+              }}
+            />
             
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <EmojiEventsIcon sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="body1">
-                Pass Score: <strong>{quiz.passingScore}%</strong>
-              </Typography>
-            </Box>
-          </Box>
-          
-          <Alert severity="info" sx={{ mb: 3 }}>
-            <Typography variant="body2">
-              Once you start the quiz, you must complete it in one session.
-              {quiz.timeLimit > 0 && ` You will have ${quiz.timeLimit} minutes to complete the quiz.`}
+            <Typography 
+              variant="h4" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 700,
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                fontSize: { xs: '1.75rem', md: '2.25rem' }
+              }}
+            >
+              {quiz.title}
             </Typography>
-          </Alert>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/quizzes')}
-            >
-              Back to Quizzes
-            </Button>
-            
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleStartQuiz}
-              size="large"
-            >
-              Start Quiz
-            </Button>
           </Box>
+          
+          <Box sx={{ p: { xs: 3, md: 5 } }}>
+            <Typography 
+              variant="body1" 
+              paragraph
+              sx={{
+                fontSize: '1rem',
+                lineHeight: 1.6,
+                color: 'var(--text-secondary)'
+              }}
+            >
+              {quiz.description}
+            </Typography>
+            
+            <Divider sx={{ my: 3, borderColor: 'var(--border-light)' }} />
+            
+            <Box 
+              sx={{ 
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                gap: 3,
+                mb: 4
+              }}
+            >
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-light)',
+                  bgcolor: 'var(--surface-bg)'
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    color: 'primary.main',
+                    mb: 1.5
+                  }}
+                >
+                  <QuizOutlinedIcon />
+                </Avatar>
+                <Typography 
+                  variant="h5" 
+                  fontWeight={600}
+                  sx={{ mb: 0.5 }}
+                >
+                  {quiz.questions.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Questions Total
+                </Typography>
+              </Box>
+              
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-light)',
+                  bgcolor: 'var(--surface-bg)'
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(theme.palette.info.main, 0.1),
+                    color: 'info.main',
+                    mb: 1.5
+                  }}
+                >
+                  <TimerOutlinedIcon />
+                </Avatar>
+                <Typography 
+                  variant="h5" 
+                  fontWeight={600}
+                  sx={{ mb: 0.5 }}
+                >
+                  {quiz.timeLimit > 0 ? quiz.timeLimit : '∞'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {quiz.timeLimit > 0 ? 'Minutes' : 'No Time Limit'}
+                </Typography>
+              </Box>
+              
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 2,
+                  borderRadius: 'var(--radius-md)', 
+                  border: '1px solid var(--border-light)',
+                  bgcolor: 'var(--surface-bg)'
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                    color: 'success.main',
+                    mb: 1.5
+                  }}
+                >
+                  <FlagOutlinedIcon />
+                </Avatar>
+                <Typography 
+                  variant="h5" 
+                  fontWeight={600}
+                  sx={{ mb: 0.5 }}
+                >
+                  {quiz.passingScore}%
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Passing Score
+                </Typography>
+              </Box>
+            </Box>
+            
+            <Alert 
+              severity="info" 
+              variant="outlined"
+              sx={{ 
+                mb: 4,
+                borderRadius: 'var(--radius-md)',
+                '& .MuiAlert-icon': {
+                  alignItems: 'center'
+                }
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                Quiz Instructions
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1, lineHeight: 1.6 }}>
+                • Once you start, you must complete the quiz in one session<br />
+                • {quiz.timeLimit > 0 ? 
+                    `You will have ${quiz.timeLimit} minutes to complete all ${quiz.questions.length} questions` : 
+                    'There is no time limit for this quiz'}
+                <br />
+                • You need to score at least {quiz.passingScore}% to pass<br />
+                • You can navigate between questions freely
+              </Typography>            </Alert>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/quizzes')}
+                  startIcon={<ArrowBackOutlinedIcon />}
+                  className="btn-secondary"
+                  sx={{ 
+                    borderRadius: 'var(--radius-md)',
+                    textTransform: 'none',
+                    fontWeight: 500
+                  }}
+                >
+                  Back to Quizzes
+                </Button>
+              
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleStartQuiz}
+                  size="large"
+                >
+                  Start Quiz
+                </Button>
+              </Box>
+            </Box>
         </Paper>
       </Container>
     );
