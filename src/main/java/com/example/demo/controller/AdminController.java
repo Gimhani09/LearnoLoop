@@ -49,7 +49,7 @@ public class AdminController {
             Authentication authentication) {
         
         Report report = reportRepository.findById(action.getReportId())
-                .orElseThrow(() -> new ReportNotFoundException("Report not found with ID: " + action.getReportId()));
+                .orElseThrow(() -> new ReportNotFoundException("Report not found: " + action.getReportId()));
 
         if (!"PENDING".equals(report.getStatus())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
