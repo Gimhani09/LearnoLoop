@@ -3,11 +3,10 @@ import {
   Container, Typography, Box, Grid, Card, CardContent, CardActions,
   Button, Chip, CircularProgress, TextField, InputAdornment, Alert,
   Paper, Divider, MenuItem, Select, FormControl, InputLabel, LinearProgress,
-  useTheme, useMediaQuery, Avatar, Skeleton, Tooltip, Fade
+  useTheme, useMediaQuery, Avatar
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import '../styles/Quiz.css';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
@@ -15,15 +14,6 @@ import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
-import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
-import FunctionsOutlinedIcon from '@mui/icons-material/FunctionsOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
-import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
-import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
-import ColorLensOutlinedIcon from '@mui/icons-material/ColorLensOutlined';
-import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
-import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 
 const QuizList = ({ user }) => {
   const [quizzes, setQuizzes] = useState([]);
@@ -150,30 +140,22 @@ const QuizList = ({ user }) => {
     if (score >= 60) return 'warning.main';
     return 'text.secondary';
   };
-  // Get icon for quiz category
-  const getCategoryIcon = (category) => {
-    switch(category.toLowerCase()) {
-      case 'programming':
-        return <CodeOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'mathematics':
-        return <FunctionsOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'science':
-        return <ScienceOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'language':
-        return <TranslateOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'history':
-        return <HistoryEduOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'art':
-        return <ColorLensOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'business':
-        return <BusinessCenterOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'data science':
-        return <DataUsageOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      case 'general knowledge':
-        return <MenuBookOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-      default:
-        return <QuizOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />;
-    }
+  
+  // Get color for quiz category
+  const getCategoryColor = (category) => {
+    const colorMap = {
+      "Programming": "#4A00E0",
+      "Mathematics": "#1E88E5",
+      "Science": "#00BFA5",
+      "Language": "#FF5722",
+      "History": "#FFC107",
+      "Art": "#E91E63",
+      "Business": "#3949AB",
+      "Data Science": "#00ACC1",
+      "General Knowledge": "#6200EA"
+    };
+    
+    return colorMap[category] || "#6200EA";
   };
   
   // Render quiz cards
@@ -242,21 +224,33 @@ const QuizList = ({ user }) => {
             sx={{ 
               animationDelay: `${index * 0.1}s` 
             }}
-          >            <Card 
+          >
+            <Card 
               elevation={0}
-              className="quiz-card"
               sx={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                transition: 'all 0.3s ease',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-light)',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 10px 20px rgba(0,0,0,0.06)',
+                  '& .quiz-image': {
+                    transform: 'scale(1.05)'
+                  }
+                }
               }}
             >
-              {/* Quiz header/banner with subtle gradient */}              <Box 
-                className={`quiz-image category-${quiz.category.toLowerCase().replace(/\s+/g, '-')}`}
+              {/* Quiz header/banner with subtle gradient */}
+              <Box 
+                className="quiz-image"
                 sx={{
                   height: 120,
+                  background: `linear-gradient(45deg, ${getCategoryColor(quiz.category)}, ${getCategoryColor(quiz.category)}99)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -275,7 +269,7 @@ const QuizList = ({ user }) => {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                   }}
                 >
-                  {getCategoryIcon(quiz.category)}
+                  <QuizOutlinedIcon sx={{ fontSize: 30, color: '#fff' }} />
                 </Avatar>
                 
                 {hasPassedQuiz(quiz.id) && (
@@ -316,10 +310,16 @@ const QuizList = ({ user }) => {
               </Box>
               
               <CardContent sx={{ flexGrow: 1, pt: 3, px: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>                  <Chip 
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Chip 
                     label={quiz.category} 
                     size="small"
-                    className="quiz-tag"
+                    sx={{ 
+                      bgcolor: 'var(--primary-light)', 
+                      color: 'var(--primary-color)',
+                      fontWeight: 500,
+                      borderRadius: '6px',
+                    }}
                   />
                 </Box>
                 
@@ -355,7 +355,8 @@ const QuizList = ({ user }) => {
                     ? `${quiz.description.substring(0, 100)}...` 
                     : quiz.description}
                 </Typography>
-                  <Box 
+                
+                <Box 
                   sx={{ 
                     display: 'flex', 
                     flexWrap: 'wrap',
@@ -364,27 +365,39 @@ const QuizList = ({ user }) => {
                     mt: 'auto'
                   }}
                 >
-                  <Tooltip title={`${quiz.questions.length} questions in this quiz`} arrow placement="top">
-                    <Box className="quiz-stat-badge">
-                      <QuizOutlinedIcon fontSize="small" sx={{ mr: 0.75, color: 'var(--primary-color)', opacity: 0.8 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
-                        {quiz.questions.length} {quiz.questions.length === 1 ? 'Question' : 'Questions'}
-                      </Typography>
-                    </Box>
-                  </Tooltip>
-                  
-                  <Tooltip 
-                    title={quiz.timeLimit > 0 ? `Time limit: ${quiz.timeLimit} minutes` : "No time limit for this quiz"} 
-                    arrow 
-                    placement="top"
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      border: '1px solid var(--border-light)',
+                      borderRadius: 'var(--radius-sm)',
+                      py: 0.75,
+                      px: 1.5,
+                      backgroundColor: 'var(--surface-bg)'
+                    }}
                   >
-                    <Box className="quiz-stat-badge">
-                      <AccessTimeOutlinedIcon fontSize="small" sx={{ mr: 0.75, color: 'var(--primary-color)', opacity: 0.8 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
-                        {quiz.timeLimit > 0 ? `${quiz.timeLimit} min` : 'No limit'}
-                      </Typography>
-                    </Box>
-                  </Tooltip>
+                    <QuizOutlinedIcon fontSize="small" sx={{ mr: 0.75, color: 'var(--primary-color)', opacity: 0.8 }} />
+                    <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
+                      {quiz.questions.length} {quiz.questions.length === 1 ? 'Question' : 'Questions'}
+                    </Typography>
+                  </Box>
+                  
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: 'var(--radius-sm)',
+                      py: 0.75,
+                      px: 1.5,
+                      backgroundColor: 'var(--surface-bg)'
+                    }}
+                  >
+                    <AccessTimeOutlinedIcon fontSize="small" sx={{ mr: 0.75, color: 'var(--primary-color)', opacity: 0.8 }} />
+                    <Typography variant="body2" sx={{ fontWeight: 500, color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
+                      {quiz.timeLimit > 0 ? `${quiz.timeLimit} min` : 'No limit'}
+                    </Typography>
+                  </Box>
                 </Box>
                 
                 {quiz.passingScore > 0 && (
@@ -400,7 +413,8 @@ const QuizList = ({ user }) => {
                     </Typography>
                   </Box>
                 )}
-                  {/* Progress indicator for quizzes the user has attempted */}
+                
+                {/* Progress indicator for quizzes the user has attempted */}
                 {!hasPassedQuiz(quiz.id) && hasAttemptedQuiz(quiz.id) && (
                   <Box sx={{ mt: 1, mb: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
@@ -417,49 +431,69 @@ const QuizList = ({ user }) => {
                         {getUserBestScore(quiz.id)}%
                       </Typography>
                     </Box>
-                    <Tooltip 
-                      title={`Your best score: ${getUserBestScore(quiz.id)}% ${getUserBestScore(quiz.id) >= quiz.passingScore ? '(Passing score: ' + quiz.passingScore + '%)' : '(Need ' + quiz.passingScore + '% to pass)'}`} 
-                      arrow 
-                      placement="top"
-                    >
-                      <LinearProgress
-                        aria-label={`Quiz progress: ${getUserBestScore(quiz.id)}%`}
-                        variant="determinate"
-                        value={getUserBestScore(quiz.id)}
-                        className="quiz-progress-bar"
-                        sx={{
-                          '& .MuiLinearProgress-bar': {
-                            backgroundColor: getUserBestScore(quiz.id) >= 80 ? 
-                              'success.main' : 
-                              getUserBestScore(quiz.id) >= 60 ? 
-                                'warning.main' : 
-                                'var(--primary-light)'
-                          }
-                        }}
-                      />
-                    </Tooltip>
+                    <LinearProgress
+                      variant="determinate"
+                      value={getUserBestScore(quiz.id)}
+                      sx={{
+                        height: 6,
+                        borderRadius: 3,
+                        backgroundColor: 'var(--surface-light)',
+                        '& .MuiLinearProgress-bar': {
+                          backgroundColor: getUserBestScore(quiz.id) >= 80 ? 
+                            'success.main' : 
+                            getUserBestScore(quiz.id) >= 60 ? 
+                              'warning.main' : 
+                              'var(--primary-light)'
+                        }
+                      }}
+                    />
                   </Box>
                 )}
               </CardContent>
               
-              <CardActions sx={{ p: 3, pt: 0 }}>                <Button 
+              <CardActions sx={{ p: 3, pt: 0 }}>
+                <Button 
                   component={Link}
                   to={`/quiz/${quiz.id}`}
                   variant="contained"
                   fullWidth
-                  className={`quiz-button ${hasPassedQuiz(quiz.id) ? "btn-success" : "btn-learn"}`}
+                  className={hasPassedQuiz(quiz.id) ? "btn-success" : "btn-learn"}
                   startIcon={hasPassedQuiz(quiz.id) ? 
                     <CheckCircleOutlinedIcon /> : 
                     hasAttemptedQuiz(quiz.id) ? 
                       <EmojiEventsOutlinedIcon /> : 
                       <SchoolOutlinedIcon />
                   }
-                  aria-label={hasPassedQuiz(quiz.id) ? 
-                    `Retake the ${quiz.title} quiz` : 
-                    hasAttemptedQuiz(quiz.id) ? 
-                      `Continue ${quiz.title} quiz with previous score of ${getUserBestScore(quiz.id)}%` : 
-                      `Start the ${quiz.title} quiz`
-                  }
+                  sx={{ 
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.9375rem',
+                    letterSpacing: '0.01em',
+                    borderRadius: 'var(--radius-md)',
+                    py: 1.2,
+                    boxShadow: 'none',
+                    transition: 'all 0.25s ease',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.2), transparent 70%)',
+                      transform: 'translateX(-100%)'
+                    },
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 10px rgba(0,0,0,0.1)',
+                      '&::after': {
+                        transform: 'translateX(100%)',
+                        transition: 'transform 0.75s ease'
+                      }
+                    }
+                  }}
                 >
                   {hasPassedQuiz(quiz.id) ? 
                     'Retake Quiz' : 
@@ -484,7 +518,8 @@ const QuizList = ({ user }) => {
         px: isMobile ? 0 : undefined
       }}
       disableGutters={isMobile}
-    >      <Box 
+    >
+      <Box 
         sx={{ 
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
@@ -493,14 +528,24 @@ const QuizList = ({ user }) => {
           mb: { xs: 3, md: 5 },
           px: isMobile ? 2 : 0
         }}
-        className="quiz-header fade-in"
+        className="fade-in"
       >
         <Box sx={{ mb: { xs: 3, md: 0 } }}>
           <Typography 
             variant="h4" 
             component="h1" 
             gutterBottom
-            className="quiz-header-title"
+            sx={{ 
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', md: '2rem' },
+              letterSpacing: '-0.02em',
+              backgroundImage: 'linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light-accent) 100%)',
+              backgroundClip: 'text',
+              textFillColor: 'transparent',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 0.5
+            }}
           >
             Available Quizzes
           </Typography>
@@ -513,15 +558,16 @@ const QuizList = ({ user }) => {
             }}
           >
             Select from our collection of educational quizzes to test your knowledge
-            {filteredQuizzes.length > 0 && !loading && (
-              <Box component="span" sx={{ fontWeight: 500 }}>
-                {' — '}{filteredQuizzes.length} {filteredQuizzes.length === 1 ? 'quiz' : 'quizzes'} available
-              </Box>
-            )}
           </Typography>
         </Box>
-          <Box 
-          className="quiz-filter-container"
+        
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2, 
+            width: { xs: '100%', sm: 'auto' } 
+          }}
         >
           <FormControl 
             sx={{ 
@@ -540,7 +586,6 @@ const QuizList = ({ user }) => {
               onChange={handleCategoryChange}
               label="Category"
               sx={{ bgcolor: 'var(--surface-bg)' }}
-              aria-label="Filter quizzes by category"
             >
               <MenuItem value="all">All Categories</MenuItem>
               {categories.slice(1).map((cat) => (
@@ -554,7 +599,6 @@ const QuizList = ({ user }) => {
             value={searchTerm}
             onChange={handleSearchChange}
             size="small"
-            aria-label="Search for quizzes"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -591,129 +635,52 @@ const QuizList = ({ user }) => {
           {error}
         </Alert>
       )}
-        <Box sx={{ px: isMobile ? 2 : 0 }}>
+      
+      <Box sx={{ px: isMobile ? 2 : 0 }}>
         {loading ? (
-          <Grid container spacing={3}>
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item}>
-                <Card 
-                  elevation={0}
-                  className="quiz-card fade-in"
-                  sx={{ 
-                    animationDelay: `${item * 0.1}s`, 
-                    height: '100%' 
-                  }}
-                >
-                  <Skeleton 
-                    variant="rectangular" 
-                    height={120} 
-                    animation="wave" 
-                    sx={{ 
-                      bgcolor: 'rgba(74, 111, 220, 0.1)',
-                      transform: 'none'
-                    }}
-                  />
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Skeleton 
-                        variant="rounded" 
-                        width={100} 
-                        height={24} 
-                        animation="wave" 
-                        sx={{ 
-                          bgcolor: 'rgba(74, 111, 220, 0.1)',
-                          transform: 'none'
-                        }}
-                      />
-                    </Box>
-                    <Skeleton 
-                      variant="text" 
-                      height={32} 
-                      width="80%" 
-                      animation="wave" 
-                      sx={{ mb: 1, transform: 'none' }}
-                    />
-                    <Skeleton 
-                      variant="text" 
-                      height={20} 
-                      animation="wave" 
-                      sx={{ transform: 'none' }}
-                    />
-                    <Skeleton 
-                      variant="text" 
-                      height={20} 
-                      width="90%" 
-                      animation="wave" 
-                      sx={{ transform: 'none' }}
-                    />
-                    <Skeleton 
-                      variant="text" 
-                      height={20} 
-                      width="70%" 
-                      animation="wave" 
-                      sx={{ mb: 2, transform: 'none' }}
-                    />
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                      <Skeleton 
-                        variant="rounded" 
-                        width={100} 
-                        height={32} 
-                        animation="wave" 
-                        sx={{ 
-                          transform: 'none' 
-                        }}
-                      />
-                      <Skeleton 
-                        variant="rounded" 
-                        width={100} 
-                        height={32} 
-                        animation="wave" 
-                        sx={{ 
-                          transform: 'none' 
-                        }}
-                      />
-                    </Box>
-                  </CardContent>
-                  <CardActions sx={{ p: 3, pt: 0 }}>
-                    <Skeleton 
-                      variant="rounded" 
-                      height={48} 
-                      width="100%" 
-                      animation="wave" 
-                      sx={{ 
-                        transform: 'none' 
-                      }}
-                    />
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              py: { xs: 6, md: 10 },
+              opacity: 0.8
+            }}
+            className="fade-in"
+          >
+            <CircularProgress size={48} thickness={4} sx={{ color: 'var(--primary-color)' }} />
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                mt: 3, 
+                fontWeight: 500,
+                color: 'var(--text-secondary)'
+              }}
+            >
+              Loading educational quizzes...
+            </Typography>
+          </Box>
         ) : (
           renderQuizCards()
         )}
       </Box>
-        {quizzes.length > 0 && filteredQuizzes.length === 0 && (searchTerm !== '' || category !== 'all') && (
-        <Fade in={filteredQuizzes.length === 0}>
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
-            <Typography variant="body1" color="text.secondary" paragraph>
-              No quizzes match your current filters.
-            </Typography>
-            <Button 
-              onClick={() => {
-                setSearchTerm('');
-                setCategory('all');
-              }}
-              variant="outlined"
-              className="btn-secondary"
-              startIcon={<FilterListIcon />}
-              sx={{ borderRadius: 'var(--radius-md)', textTransform: 'none', fontWeight: 500 }}
-            >
-              Clear Filters
-            </Button>
-          </Box>
-        </Fade>
+      
+      {quizzes.length > 0 && filteredQuizzes.length === 0 && searchTerm !== '' && (
+        <Box sx={{ textAlign: 'center', mt: 6 }}>
+          <Button 
+            onClick={() => {
+              setSearchTerm('');
+              setCategory('all');
+            }}
+            variant="outlined"
+            className="btn-secondary"
+            startIcon={<FilterListIcon />}
+            sx={{ borderRadius: 'var(--radius-md)', textTransform: 'none', fontWeight: 500 }}
+          >
+            Clear Filters
+          </Button>
+        </Box>
       )}
     </Container>
   );
