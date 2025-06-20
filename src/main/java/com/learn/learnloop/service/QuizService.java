@@ -1,12 +1,12 @@
-package com.example.demo.service;
+package com.learn.learnloop.service;
 
-import com.example.demo.dto.QuizDTO;
-import com.example.demo.model.Quiz;
-import com.example.demo.model.QuizAttempt;
-import com.example.demo.model.User;
-import com.example.demo.repository.QuizAttemptRepository;
-import com.example.demo.repository.QuizRepository;
-import com.example.demo.repository.UserRepository;
+import com.learn.learnloop.dto.QuizDTO;
+import com.learn.learnloop.model.Quiz;
+import com.learn.learnloop.model.QuizAttempt;
+import com.learn.learnloop.model.User;
+import com.learn.learnloop.repository.QuizAttemptRepository;
+import com.learn.learnloop.repository.QuizRepository;
+import com.learn.learnloop.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

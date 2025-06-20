@@ -1,6 +1,6 @@
-package com.example.demo.repository;
+package com.learn.learnloop.repository;
 
-import com.example.demo.model.QuizAttempt;
+import com.learn.learnloop.model.QuizAttempt;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

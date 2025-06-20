@@ -1,10 +1,10 @@
-package com.example.demo.controller;
+package com.learn.learnloop.controller;
 
-import com.example.demo.dto.QuizAttemptDTO;
-import com.example.demo.model.QuizAttempt;
-import com.example.demo.model.User;
-import com.example.demo.service.QuizAttemptService;
-import com.example.demo.repository.UserRepository;
+import com.learn.learnloop.dto.QuizAttemptDTO;
+import com.learn.learnloop.model.QuizAttempt;
+import com.learn.learnloop.model.User;
+import com.learn.learnloop.service.QuizAttemptService;
+import com.learn.learnloop.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -192,7 +192,8 @@ public class QuizAttemptController {
         }
         
         String username = auth.getName();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
         if (user == null) {
             throw new IllegalArgumentException("User not found");

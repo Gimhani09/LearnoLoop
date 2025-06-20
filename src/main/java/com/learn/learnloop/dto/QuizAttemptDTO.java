@@ -1,6 +1,6 @@
-package com.example.demo.dto;
+package com.learn.learnloop.dto;
 
-import com.example.demo.model.QuizAttempt;
+import com.learn.learnloop.model.QuizAttempt;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

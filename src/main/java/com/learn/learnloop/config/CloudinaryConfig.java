@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.learn.learnloop.config;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.context.annotation.Bean;

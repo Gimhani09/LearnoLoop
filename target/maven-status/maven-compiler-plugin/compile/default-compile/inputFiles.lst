@@ -1,13 +1,24 @@
-D:\PAF App\src\main\java\com\example\pafapp\model\SkillSharingIdea.java
-D:\PAF App\src\main\java\com\example\pafapp\PafAppApplication.java
-D:\PAF App\src\main\java\com\example\pafapp\config\MongoConfig.java
-D:\PAF App\src\main\java\com\example\pafapp\model\Comment.java
-D:\PAF App\src\main\java\com\example\pafapp\controller\CommentController.java
-D:\PAF App\src\main\java\com\example\pafapp\controller\SkillSharingIdeaController.java
-D:\PAF App\src\main\java\com\example\pafapp\service\CloudinaryService.java
-D:\PAF App\src\main\java\com\example\pafapp\config\CloudinaryConfig.java
-D:\PAF App\src\main\java\com\example\pafapp\controller\WebController.java
-D:\PAF App\src\main\java\com\example\pafapp\repository\SkillSharingIdeaRepository.java
-D:\PAF App\src\main\java\com\example\pafapp\config\WebConfig.java
-D:\PAF App\src\main\java\com\example\pafapp\repository\CommentRepository.java
-D:\PAF App\src\main\java\com\example\pafapp\service\CommentService.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/repository/UserRepository.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/controller/AuthController.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/model/QuizAttempt.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/config/SecurityConfig.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/dto/QuizDTO.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/config/SessionConfig.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/repository/QuizRepository.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/LearnloopApplication.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/config/DataInitializer.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/model/User.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/service/AuthService.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/controller/QuizAttemptController.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/service/QuizAttemptService.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/dto/QuizAttemptDTO.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/service/QuizService.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/model/Quiz.java
+/workspaces/LearnoLoop/src/main/java/main/java/com/example/pafapp/controller/SkillSharingIdeaController.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/repository/QuizAttemptRepository.java
+/workspaces/LearnoLoop/src/main/java/main/java/com/example/pafapp/PafAppApplication.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/config/MongoConfig.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/controller/QuizController.java
+/workspaces/LearnoLoop/src/main/java/main/java/com/example/pafapp/repository/SkillSharingIdeaRepository.java
+/workspaces/LearnoLoop/src/main/java/main/java/com/example/pafapp/model/SkillSharingIdea.java
+/workspaces/LearnoLoop/src/main/java/com/learn/learnloop/config/CloudinaryConfig.java

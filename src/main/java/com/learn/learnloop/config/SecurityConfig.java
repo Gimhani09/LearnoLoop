@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.learn.learnloop.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,15 +8,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,28 +29,23 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for development
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .securityContext(context -> context
-                .securityContextRepository(
-                    new DelegatingSecurityContextRepository(
-                        new HttpSessionSecurityContextRepository(),
-                        new RequestAttributeSecurityContextRepository()
-                    )
-                )
+                .securityContextRepository(new HttpSessionSecurityContextRepository())
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/posts/**").permitAll()
-                .requestMatchers("/api/reports/**").permitAll()
-                .requestMatchers("/api/comments/**").permitAll()
-                .requestMatchers("/api/images/**").permitAll()
-                .requestMatchers("/api/users/username/**").permitAll() // Allow public user profile viewing
-                .requestMatchers("/api/users/**").authenticated() // Require authentication for user operations
-                .requestMatchers("/api/quizzes").permitAll() // Allow public viewing of available quizzes
-                .requestMatchers("/api/quizzes/category/**").permitAll()
-                .requestMatchers("/api/quizzes/{id}").permitAll()
-                .requestMatchers("/api/quizzes/**").authenticated() // Other quiz operations require authentication
-                .requestMatchers("/api/quiz-attempts/**").authenticated() // Quiz attempts require authentication
-                .requestMatchers("/api/quiz-attempts/leaderboard/**").permitAll() // Public leaderboards
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/posts/**").permitAll()
+                .antMatchers("/api/reports/**").permitAll()
+                .antMatchers("/api/comments/**").permitAll()
+                .antMatchers("/api/images/**").permitAll()
+                .antMatchers("/api/users/username/**").permitAll() // Allow public user profile viewing
+                .antMatchers("/api/users/**").authenticated() // Require authentication for user operations
+                .antMatchers("/api/quizzes").permitAll() // Allow public viewing of available quizzes
+                .antMatchers("/api/quizzes/category/**").permitAll()
+                .antMatchers("/api/quizzes/{id}").permitAll()
+                .antMatchers("/api/quizzes/**").authenticated() // Other quiz operations require authentication
+                .antMatchers("/api/quiz-attempts/**").authenticated() // Quiz attempts require authentication
+                .antMatchers("/api/quiz-attempts/leaderboard/**").permitAll() // Public leaderboards
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
             .exceptionHandling(exception -> exception

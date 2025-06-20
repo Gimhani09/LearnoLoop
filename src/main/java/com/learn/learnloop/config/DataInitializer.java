@@ -1,7 +1,7 @@
-package com.example.demo.config;
+package com.learn.learnloop.config;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.learn.learnloop.model.User;
+import com.learn.learnloop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

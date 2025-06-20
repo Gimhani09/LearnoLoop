@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.learn.learnloop.config;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -16,7 +16,7 @@ import org.springframework.lang.NonNull;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "com.example.demo.repository")
+@EnableMongoRepositories(basePackages = "com.learn.learnloop.repository")
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
